@@ -2,6 +2,10 @@ import torch
 import torch.nn as nn
 import numpy as np
 
+def cascade_dims(input_dim, output_dim, depth):
+    dimensions = [int(output_dim + (input_dim - output_dim)*(depth-i)/depth) for i in range(depth+1)]
+    return dimensions
+
 #%%%%%%% Classes %%%%%%%%#
 
 class DNN_block(nn.Module):
@@ -32,9 +36,8 @@ class DNN_block(nn.Module):
 
     def forward(self, x):
         if self.input_bn is not None:
-            print(x.shape)
-            x = self.input_bn(x.transpose(1,2)) # must transpose because batchnorm expects N,C,L rather than N,L,C like multihead
-            x = x.transpose(1,2) # revert transpose
+            x = self.input_bn(x) # must transpose because batchnorm expects N,C,L rather than N,L,C like multihead # .transpose(1,2)
+            x = x #.transpose(1,2) # revert transpose
         return self.net(x)
 
 class Model(nn.Module):
@@ -44,7 +47,7 @@ class Model(nn.Module):
         super().__init__()
 
         # embed, In -> Out : J,C -> J,E
-        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim] + (embed_nlayers+1)*[embed_dim], normalize_input=True)
+        self.embed = DNN_block(embed_input_dim, embed_dim, cascade_dims(embed_input_dim, embed_dim, embed_nlayers), normalize_input=False)
 
     def forward(self, x):
 

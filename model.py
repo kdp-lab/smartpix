@@ -30,7 +30,6 @@ class ModelLightning(pl.LightningModule):
         # forward pass
         x, y = batch
         x = self(x)
-        print(x.shape, y.shape)
 
         # compute loss
         loss = self.loss(x, y)
@@ -57,6 +56,8 @@ class ModelLightning(pl.LightningModule):
         ''' 
         cout/cin = [B, E]
         '''
+
+        print(yhat[0], y[0])
 
         # total loss
         l = {}
