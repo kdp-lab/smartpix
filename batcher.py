@@ -18,7 +18,8 @@ def loadDataFromCSV(xInFileName, yInFileName, nrows=None):
     x = np.concatenate([x,np.zeros((x.shape[0],1))], -1)
     # pick up the labels
     y = pd.read_csv(yInFileName, nrows=nrows) # to get column names list(y.columns): ['x-entry', 'y-entry', 'z-entry', 'n_x', 'n_y', 'n_z', 'number_eh_pairs', 'y-local', 'pt', 'cotAlpha', 'cotBeta', 'y-midplane', 'x-midplane']
-    #y = y['y-midplane'].values # ['x-midplane','y-midplane']
+    # y = y['y-midplane'].values # ['x-midplane','y-midplane']
+    # print(y['y-local'].values[:10]) # Question: does y_0 == y-local?
 
     # The models are trained with three output categories:
     pt = y['pt'].values
@@ -47,5 +48,5 @@ if __name__ == "__main__":
     parser.add_argument("-y",  "--yInFileName", default=None, help="Input file")
     ops = parser.parse_args()
 
-    x, y = loadDataFromCSV(ops.xInFileName, ops.yInFileName, 1000)
+    x, y = loadDataFromCSV(ops.xInFileName, ops.yInFileName, None)
     print(x.shape, y.shape)
