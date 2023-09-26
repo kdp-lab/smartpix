@@ -38,6 +38,9 @@ class ModelLightning(pl.LightningModule):
         for key, val in loss.items():
             self.log(f"{version}_{key}", val, prog_bar=(key=="loss"), on_step=True)
         
+        # log the accuracy
+        self.log(f"{version}_acc", self.acc(x, y), prog_bar=True, on_step=True)
+
         #print(loss["loss"])
         return loss["loss"]
     
@@ -51,6 +54,9 @@ class ModelLightning(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=0)
         return optimizer
     
+    def acc(self, yhat, y):
+        return (torch.argmax(yhat, dim=1) == y).sum() / y.numel()
+
     def loss(self, yhat, y):
 
         ''' 
