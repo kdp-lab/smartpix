@@ -1,8 +1,8 @@
 {
   "model": {
     "model_config": {
-      "embed_input_dim": 273,
-      "embed_dim": 1,
+      "embed_input_dim": 14,
+      "embed_dim": 3,
       "embed_nlayers": 3
     },
     "weights": false,

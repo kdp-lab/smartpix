@@ -25,7 +25,7 @@ class DNN_block(nn.Module):
             if dim_out != output_dim or iD != len(dimensions[1:])-1:
                 layers.extend([
                     nn.Linear(dim_in, dim_out),
-                    nn.LayerNorm(dim_out),
+                    # nn.LayerNorm(dim_out),
                     nn.ReLU(),
                 ])
             else:
@@ -47,9 +47,8 @@ class Model(nn.Module):
         super().__init__()
 
         # embed, In -> Out : J,C -> J,E
-        self.embed = DNN_block(embed_input_dim, embed_dim, cascade_dims(embed_input_dim, embed_dim, embed_nlayers), normalize_input=False)
+        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 128, embed_dim], normalize_input=False) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
 
     def forward(self, x):
-
         x = self.embed(x)
         return x

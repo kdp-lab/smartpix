@@ -57,11 +57,12 @@ class ModelLightning(pl.LightningModule):
         cout/cin = [B, E]
         '''
 
-        print(yhat[0], y[0])
+        # print(yhat[0], y[0])
 
         # total loss
         l = {}
-        l["mse"] = torch.mean((yhat-y)**2)
+        # l["mse"] = torch.mean((yhat-y)**2)
+        l["cel"] = torch.nn.CrossEntropyLoss()(yhat, y)
         
         # get total
         l['loss'] = sum(l.values())

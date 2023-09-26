@@ -63,6 +63,7 @@ if __name__ == "__main__":
 
     # create model
     model = ModelLightning(**config["model"])
+    print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
     #model = torch.compile(model) # ready for pytorch 2.0 once it's more stable
 
     # callbacks
