@@ -12,5 +12,5 @@
     "precision": 32,
     "gradient_clip_val": 0.1
   },
-  "batch_size": 16
+  "batch_size": 1024
 }
