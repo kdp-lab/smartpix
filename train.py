@@ -49,7 +49,7 @@ if __name__ == "__main__":
     pin_memory = (device == "gpu")
 
     # load and split
-    x, y = loadDataFromCSV(ops.xInFileName, ops.yInFileName, 500)
+    x, y = loadDataFromCSV(ops.xInFileName, ops.yInFileName, None)
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size = 0.25)
     print(f"x_train {x_train.shape}, x_val {x_val.shape}, y_train {y_train.shape}, y_val {y_val.shape}")
     train_dataloader = DataLoader(TensorDataset(x_train, y_train), shuffle=True, num_workers=4, pin_memory=pin_memory, batch_size=config["batch_size"]) # if multiple inputs beside just X then use DataLoader(TensorDataset(X, ...), ...)
