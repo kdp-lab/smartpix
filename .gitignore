@@ -1,0 +1,4 @@
+# folder
+data*
+checkpoints/
+__pycache__/
