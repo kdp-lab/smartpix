@@ -11,6 +11,8 @@ import datetime
 import json
 import argparse
 import torch
+import h5py
+import glob
 from torch.utils.data import DataLoader, TensorDataset
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
@@ -19,6 +21,7 @@ from sklearn.model_selection import train_test_split
 # custom code
 from batcher import loadDataFromH5
 from model import ModelLightning
+from convertEventFileToH5 import convertEventFileToH5
 
 if __name__ == "__main__":
 
@@ -88,3 +91,8 @@ if __name__ == "__main__":
     
     # save model
     trainer.save_checkpoint(os.path.join(checkpoint_dir,"finalWeights.ckpt"))
+
+    # save the logged metrics
+    event_file_path = glob.glob(os.path.join(checkpoint_dir, "*/*/*events.out*"))[0]
+    hdf5_file_path = os.path.join(checkpoint_dir, "logged_metrics.h5")
+    convertEventFileToH5(event_file_path, hdf5_file_path)

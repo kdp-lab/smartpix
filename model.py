@@ -36,7 +36,7 @@ class ModelLightning(pl.LightningModule):
 
         # log the loss
         for key, val in loss.items():
-            self.log(f"{version}_{key}", val, prog_bar=(key=="loss"), on_step=True)
+            self.log(f"{version}_{key}", val, prog_bar=(key=="loss"), on_step=True, logger=True)
         
         # log the accuracy
         # self.log(f"{version}_acc", self.acc(x, y), prog_bar=True, on_step=True)
