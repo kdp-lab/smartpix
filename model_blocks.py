@@ -25,7 +25,7 @@ class DNN_block(nn.Module):
             if dim_out != output_dim or iD != len(dimensions[1:])-1:
                 layers.extend([
                     nn.Linear(dim_in, dim_out),
-                    # nn.LayerNorm(dim_out),
+                    nn.BatchNorm1d(dim_out), # nn.LayerNorm
                     nn.ReLU(),
                 ])
             else:
@@ -38,7 +38,11 @@ class DNN_block(nn.Module):
         if self.input_bn is not None:
             x = self.input_bn(x) # must transpose because batchnorm expects N,C,L rather than N,L,C like multihead # .transpose(1,2)
             x = x #.transpose(1,2) # revert transpose
-        return self.net(x)
+        #print(x[0])
+        for i in self.net:
+            x = i(x)
+            # print(x[0])
+        return x #self.net(x)
 
 class Model(nn.Module):
 
@@ -47,7 +51,7 @@ class Model(nn.Module):
         super().__init__()
 
         # embed, In -> Out : J,C -> J,E
-        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 30, 30, embed_dim], normalize_input=False) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
+        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 30, 30, 30, 30, embed_dim], normalize_input=False) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
 
     def forward(self, x):
         x = self.embed(x)

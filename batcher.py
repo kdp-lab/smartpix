@@ -25,8 +25,9 @@ def loadDataFromH5(inFileName):
     # y_midplane = y[:,1] + cotBeta*(sensor_thickness/2 - y[:,2]) # y-entry + cotBeta*(sensor_thickness/2 - z-entry)
 
     # for 1D only the last time slice
-    x = x[:,-1].reshape(x.shape[0], -1)
-    
+    # x = x[:,-1].reshape(x.shape[0], -1)
+    x = x[:,-1].sum(2) 
+
     # convert to tensor
     x = torch.Tensor(x)
     y = torch.Tensor(cotBeta)
