@@ -25,8 +25,8 @@ def loadDataFromH5(inFileName):
     # y_midplane = y[:,1] + cotBeta*(sensor_thickness/2 - y[:,2]) # y-entry + cotBeta*(sensor_thickness/2 - z-entry)
 
     # for 1D only the last time slice
-    x = x[:,-1]
-
+    x = x[:,-1].reshape(x.shape[0], -1)
+    
     # convert to tensor
     x = torch.Tensor(x)
     y = torch.Tensor(cotBeta)
@@ -36,9 +36,8 @@ def loadDataFromH5(inFileName):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-x",  "--xInFileName", default=None, help="Input file")
-    parser.add_argument("-y",  "--yInFileName", default=None, help="Input file")
+    parser.add_argument("-i",  "--inFileName", default=None, help="Input file")
     ops = parser.parse_args()
 
-    x, y = loadDataFromH5(ops.xInFileName)
+    x, y = loadDataFromH5(ops.inFileName)
     print(x.shape, y.shape)

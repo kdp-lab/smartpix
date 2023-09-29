@@ -47,7 +47,7 @@ class Model(nn.Module):
         super().__init__()
 
         # embed, In -> Out : J,C -> J,E
-        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 128, embed_dim], normalize_input=False) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
+        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 30, 30, embed_dim], normalize_input=False) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
 
     def forward(self, x):
         x = self.embed(x)

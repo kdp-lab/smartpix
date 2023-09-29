@@ -17,7 +17,7 @@ from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
 
 # custom code
-from batcher import loadDataFromCSV
+from batcher import loadDataFromH5
 from model import ModelLightning
 
 if __name__ == "__main__":
@@ -25,8 +25,7 @@ if __name__ == "__main__":
     # user options
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-c", "--config_file", help="Configuration file.", default="./minimal_config.json")
-    parser.add_argument("-x",  "--xInFileName", default=None, help="Input data file")
-    parser.add_argument("-y",  "--yInFileName", default=None, help="Input labels file")
+    parser.add_argument("-i",  "--inFileName", default=None, help="Input data file")
     parser.add_argument("-o", "--outDir", help="File name of the output directory", default="./checkpoints")
     parser.add_argument("-e", "--max_epochs", help="Max number of epochs to train on", default=None, type=int)
     parser.add_argument("-s", "--max_steps", help="Max number of steps to train on", default=-1, type=int)
@@ -49,7 +48,7 @@ if __name__ == "__main__":
     pin_memory = (device == "gpu")
 
     # load and split
-    x, y = loadDataFromCSV(ops.xInFileName, ops.yInFileName, None)
+    x, y = loadDataFromH5(ops.inFileName)
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size = 0.25)
     print(f"x_train {x_train.shape}, x_val {x_val.shape}, y_train {y_train.shape}, y_val {y_val.shape}")
     train_dataloader = DataLoader(TensorDataset(x_train, y_train), shuffle=True, num_workers=4, pin_memory=pin_memory, batch_size=config["batch_size"]) # if multiple inputs beside just X then use DataLoader(TensorDataset(X, ...), ...)

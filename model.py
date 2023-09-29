@@ -39,7 +39,7 @@ class ModelLightning(pl.LightningModule):
             self.log(f"{version}_{key}", val, prog_bar=(key=="loss"), on_step=True)
         
         # log the accuracy
-        self.log(f"{version}_acc", self.acc(x, y), prog_bar=True, on_step=True)
+        # self.log(f"{version}_acc", self.acc(x, y), prog_bar=True, on_step=True)
 
         #print(loss["loss"])
         return loss["loss"]
@@ -55,7 +55,7 @@ class ModelLightning(pl.LightningModule):
         return optimizer
     
     def acc(self, yhat, y):
-        return (torch.argmax(yhat, dim=1) == y).sum() / y.numel()
+        return None # (torch.argmax(yhat, dim=1) == y).sum() / y.numel()
 
     def loss(self, yhat, y):
 
@@ -67,8 +67,7 @@ class ModelLightning(pl.LightningModule):
 
         # total loss
         l = {}
-        # l["mse"] = torch.mean((yhat-y)**2)
-        l["cel"] = torch.nn.CrossEntropyLoss()(yhat, y)
+        l["mse"] = torch.mean((yhat-y)**2)
         
         # get total
         l['loss'] = sum(l.values())
