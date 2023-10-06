@@ -91,8 +91,9 @@ if __name__ == "__main__":
         data = sorted(glob.glob(data))
 
     # make output dir
-    if not os.path.isdir(ops.outDir):
-        os.makedirs(ops.outDir)
+    outDir = ops.outDir if ops.outDir != "same" else os.path.dirname(ops.weights)
+    if not os.path.isdir(outDir):
+        os.makedirs(outDir)
 
     # pick up model configurations
     print(f"Using configuration file: {ops.config_file}")
@@ -107,7 +108,7 @@ if __name__ == "__main__":
     for inFileName in data:
 
         # make out file name and check if already exists
-        outFileName = os.path.join(ops.outDir, os.path.basename(inFileName)).replace(".h5","_Model.h5")
+        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model.h5")
         if os.path.isfile(outFileName) and not ops.doOverwrite:
             print(f"File already exists not evaluating on: {outFileName}")
             continue

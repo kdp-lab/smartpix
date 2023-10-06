@@ -19,7 +19,7 @@ def loadDataFromH5(inFileName):
     # taken from https://zenodo.org/record/7331128
     # other relevant parameters to compute are https://github.com/kdipetri/semiparametric/blob/master/processing/datagen.py#L110C9-L115C95
     # cotAlpha = y[:,3]/y[:,5] # n_x/n_z
-    cotBeta = y[:,4]/y[:,5] # n_y/n_z
+    cotBeta = abs(y[:,4]/y[:,5]) + 1e-9 # n_y/n_z
     # sensor_thickness = 100 #um                                                          
     # x_midplane = y[:,0] + cotBeta*(sensor_thickness/2 - y[:,2]) # x-entry + cotAlpha*(sensor_thickness/2 - z-entry)
     # y_midplane = y[:,1] + cotBeta*(sensor_thickness/2 - y[:,2]) # y-entry + cotBeta*(sensor_thickness/2 - z-entry)
@@ -27,10 +27,15 @@ def loadDataFromH5(inFileName):
     # for 1D only the last time slice
     # x = x[:,-1].reshape(x.shape[0], -1)
     x = x[:,-1].sum(2) 
+    # x = (x-x.mean())/x.std()
+
+    # event selection
+    # mask = abs(y[:,8]) >= 0.3 # pt>0.3 GeV
+    # print(mask.sum()/mask.shape[0])
 
     # convert to tensor
-    x = torch.Tensor(x)
-    y = torch.Tensor(cotBeta)
+    x = torch.Tensor(x) #[mask])
+    y = torch.Tensor(cotBeta) #[mask])
 
     return x, y 
     

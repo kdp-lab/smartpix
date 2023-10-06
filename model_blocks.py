@@ -35,13 +35,15 @@ class DNN_block(nn.Module):
         self.net = nn.Sequential(*layers)
 
     def forward(self, x):
+        #print("Input: ", x[0])
         if self.input_bn is not None:
             x = self.input_bn(x) # must transpose because batchnorm expects N,C,L rather than N,L,C like multihead # .transpose(1,2)
             x = x #.transpose(1,2) # revert transpose
-        #print(x[0])
-        for i in self.net:
+        #print("After BN: ", x[0])
+        for iN, i in enumerate(self.net):
             x = i(x)
-            # print(x[0])
+            #print(f"Block {iN}: ", x[0])
+        
         return x #self.net(x)
 
 class Model(nn.Module):
@@ -51,8 +53,10 @@ class Model(nn.Module):
         super().__init__()
 
         # embed, In -> Out : J,C -> J,E
-        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 30, 30, 30, 30, embed_dim], normalize_input=False) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
-
+        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, 64, embed_dim], normalize_input=False) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
+        # self.final = torch.nn.Tanh()
     def forward(self, x):
         x = self.embed(x)
+        # x = self.final(x)
+        # print("After tanh: ", x[0])
         return x

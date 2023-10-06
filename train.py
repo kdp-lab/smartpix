@@ -84,7 +84,7 @@ if __name__ == "__main__":
         callbacks=callbacks,
         default_root_dir=checkpoint_dir,
         # detect_anomaly=True,
-        **config["trainer"]
+        # **config["trainer"]
     )
     
     # fit

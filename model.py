@@ -67,8 +67,8 @@ class ModelLightning(pl.LightningModule):
 
         # total loss
         l = {}
-        # l["mse"] = torch.mean((yhat-y)**2)
-        l["mae"] = torch.mean(torch.abs(yhat-y))
+        l["mse"] = torch.mean((yhat-y)**2)
+        # l["mae"] = torch.mean(torch.abs(yhat-y))
 
         # get total
         l['loss'] = sum(l.values())
