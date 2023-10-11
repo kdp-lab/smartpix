@@ -7,6 +7,35 @@ import torch
 import numpy as np
 import argparse
 import h5py
+import pandas as pd
+
+def loadDataFromPd():
+    datadir='/data/ckumar/'
+    #train_df = pd.read_csv(datadir+'train_1Dy_23-09-29-c.csv')
+    #test_df = pd.read_csv(datadir+'test_1Dy_23-09-29-c.csv')
+    train_df = pd.read_csv(datadir+'train_1Dy_d17201.csv')
+    test_df = pd.read_csv(datadir+'test_1Dy_d17201.csv')
+    #train_df = pd.read_csv(datadir+'train_1Dy_23-10-04.csv')
+    #test_df = pd.read_csv(datadir+'train_1Dy_23-10-04.csv')
+
+    train_df = train_df.dropna()
+    test_df = test_df.dropna()
+
+    x_train = train_df.drop(columns=['y-midplane','cotBeta','pt', 'cotAlpha', 'y-local']).values
+    x_test = test_df.drop(columns=['y-midplane','cotBeta','pt', 'cotAlpha', 'y-local']).values
+
+    y_train = (train_df['cotBeta'].values)
+    y_test = (test_df['cotBeta'].values)
+
+    x = np.concatenate([x_train,x_test])
+    y = np.concatenate([y_train,y_test])
+
+    # convert to tensor
+    x = torch.Tensor(x)
+    y = torch.Tensor(y)
+
+    return x, y
+
 
 def loadDataFromH5(inFileName):
     
@@ -19,15 +48,20 @@ def loadDataFromH5(inFileName):
     # taken from https://zenodo.org/record/7331128
     # other relevant parameters to compute are https://github.com/kdipetri/semiparametric/blob/master/processing/datagen.py#L110C9-L115C95
     # cotAlpha = y[:,3]/y[:,5] # n_x/n_z
-    cotBeta = abs(y[:,4]/y[:,5]) + 1e-9 # n_y/n_z
+    cotBeta = y[:,4]/y[:,5] # n_y/n_z
+    # cotBeta = abs(cotBeta)
     # sensor_thickness = 100 #um                                                          
     # x_midplane = y[:,0] + cotBeta*(sensor_thickness/2 - y[:,2]) # x-entry + cotAlpha*(sensor_thickness/2 - z-entry)
     # y_midplane = y[:,1] + cotBeta*(sensor_thickness/2 - y[:,2]) # y-entry + cotBeta*(sensor_thickness/2 - z-entry)
+    y_local = y[:,7]
 
     # for 1D only the last time slice
     # x = x[:,-1].reshape(x.shape[0], -1)
-    x = x[:,-1].sum(2) 
+    x = x[:,-1].sum(2)
     # x = (x-x.mean())/x.std()
+                
+    # form final input
+    # x = np.concatenate([x, y_local.reshape(-1,1)],-1)
 
     # event selection
     # mask = abs(y[:,8]) >= 0.3 # pt>0.3 GeV

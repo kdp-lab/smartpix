@@ -67,7 +67,7 @@ class ModelLightning(pl.LightningModule):
 
         # total loss
         l = {}
-        l["mse"] = torch.mean((yhat-y)**2)
+        l["mse"] = torch.nn.functional.mse_loss(yhat.flatten(), y) # torch.mean((yhat.flatten()-y)**2) need to be vary careful about the dimensions so letting torch handle it 
         # l["mae"] = torch.mean(torch.abs(yhat-y))
 
         # get total

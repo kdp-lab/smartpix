@@ -19,7 +19,7 @@ from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
 
 # custom code
-from batcher import loadDataFromH5
+from batcher import loadDataFromH5, loadDataFromPd
 from model import ModelLightning
 from convertEventFileToH5 import convertEventFileToH5
 
@@ -52,6 +52,7 @@ if __name__ == "__main__":
 
     # load and split
     x, y = loadDataFromH5(ops.inFileName)
+    # x, y = loadDataFromPd()
     # x, y = x[:100], abs(y[:100])
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size = 0.25)
     print(f"x_train {x_train.shape}, x_val {x_val.shape}, y_train {y_train.shape}, y_val {y_val.shape}")

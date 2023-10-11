@@ -25,8 +25,9 @@ class DNN_block(nn.Module):
             if dim_out != output_dim or iD != len(dimensions[1:])-1:
                 layers.extend([
                     nn.Linear(dim_in, dim_out),
-                    nn.BatchNorm1d(dim_out), # nn.LayerNorm
+                    # nn.LayerNorm(dim_out), # nn.BatchNorm1d
                     nn.ReLU(),
+                    nn.BatchNorm1d(dim_out)
                 ])
             else:
                 layers.extend([
@@ -53,7 +54,8 @@ class Model(nn.Module):
         super().__init__()
 
         # embed, In -> Out : J,C -> J,E
-        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, 64, embed_dim], normalize_input=False) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
+        # self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, 64, embed_dim], normalize_input=True) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
+        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, embed_dim], normalize_input=False)
         # self.final = torch.nn.Tanh()
     def forward(self, x):
         x = self.embed(x)

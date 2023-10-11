@@ -22,7 +22,7 @@ except RuntimeError:
     pass
 
 # custom code
-from batcher import loadDataFromH5
+from batcher import loadDataFromH5, loadDataFromPd
 from model import ModelLightning
 
 def evaluate(config):
@@ -40,6 +40,7 @@ def evaluate(config):
 
     # load data
     x, y = loadDataFromH5(config["inFileName"])
+    # x, y = loadDataFromPd()
     
     # evaluate
     outData = {}
