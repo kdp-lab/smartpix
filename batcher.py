@@ -78,7 +78,9 @@ def loadDataFromH5(inFileName):
 
     # convert to tensor
     x = torch.Tensor(x) #[mask])
-    y = torch.Tensor([eta], [phi]) #[mask])
+    e = torch.Tensor(eta) #[mask])
+    p = torch.Tensor(phi)
+    y = torch.cat((e, p),1)
 
     return x, y 
     
