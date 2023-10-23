@@ -1,0 +1,16 @@
+{
+  "model": {
+    "model_config": {
+      "embed_input_dim": 13,
+      "embed_dim": 1,
+      "embed_nlayers": 2
+    },
+    "weights": false,
+    "lr": 0.001
+  },
+  "trainer": {
+    "precision": 32,
+    "gradient_clip_val": 0.1
+  },
+  "batch_size": 1024
+}
