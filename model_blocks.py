@@ -42,8 +42,8 @@ class DNN_block(nn.Module):
             x = x #.transpose(1,2) # revert transpose
         #print("After BN: ", x[0])
         for iN, i in enumerate(self.net):
+            print(f"Block {iN}: ", x.shape)
             x = i(x)
-            #print(f"Block {iN}: ", x[0])
         
         return x #self.net(x)
 

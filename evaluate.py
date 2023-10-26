@@ -46,11 +46,11 @@ def evaluate(config):
     outData = {}
     with torch.no_grad():
         
-        y_hat = model(x) # .to(config["device"]) # uncomment to use the gpu memory
+        angles = model(x) # .to(config["device"]) # uncomment to use the gpu memory
                 
         # make output
         outData = {
-            "y_hat": y_hat.numpy().flatten(), # raw prediction
+            "angles": angles #.numpy().flatten(), eliminated the flatten in the model as well # raw prediction
         }
 
     # save final file

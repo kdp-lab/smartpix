@@ -10,6 +10,7 @@ import os
 import datetime
 import json
 import argparse
+os.environ["CUDA_VISIBLE_DEVICES"] = "0" 
 import torch
 import h5py
 import glob

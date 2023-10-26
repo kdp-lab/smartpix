@@ -65,7 +65,7 @@ def loadDataFromH5(inFileName):
     #pT = y[:,8]
     
     # for 1D only the last time slice
-    # x = x[:,-1].reshape(x.shape[0], -1)
+    x = x[:,-1].reshape(x.shape[0], -1)
     # x = x[:,-1].sum(2)
     # x = (x-x.mean())/x.std()
                 
@@ -80,7 +80,7 @@ def loadDataFromH5(inFileName):
     x = torch.Tensor(x) #[mask])
     e = torch.Tensor(eta) #[mask])
     p = torch.Tensor(phi)
-    y = torch.cat((e, p),1)
+    y = torch.stack((e, p),dim=-1)
 
     return x, y 
     
