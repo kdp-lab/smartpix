@@ -53,7 +53,8 @@ def loadDataFromH5(inFileName):
     # sensor_thickness = 100 #um                                                          
     # x_midplane = y[:,0] + cotBeta*(sensor_thickness/2 - y[:,2]) # x-entry + cotAlpha*(sensor_thickness/2 - z-entry)
     # y_midplane = y[:,1] + cotBeta*(sensor_thickness/2 - y[:,2]) # y-entry + cotBeta*(sensor_thickness/2 - z-entry)
-    y_local = y[:,7]
+    y_local = torch.Tensor(y[:,7])
+    y_local = torch.unsqueeze(y_local, dim=1)
 
     #new angles
     nx = torch.Tensor(y[:,3])
@@ -77,7 +78,10 @@ def loadDataFromH5(inFileName):
     # print(mask.sum()/mask.shape[0])
 
     # convert to tensor
-    x = torch.Tensor(x) #[mask])
+    xcluster = torch.Tensor(x)#[mask])
+    print(xcluster.shape)
+    print(y_local.shape)
+    x = torch.concatenate([xcluster, y_local], dim=1)
     e = torch.Tensor(eta) #[mask])
     p = torch.Tensor(phi)
     y = torch.stack((e, p),dim=-1)
