@@ -42,7 +42,7 @@ class DNN_block(nn.Module):
             x = x #.transpose(1,2) # revert transpose
         #print("After BN: ", x[0])
         for iN, i in enumerate(self.net):
-            print(f"Block {iN}: ", x.shape)
+            #print(f"Block {iN}: ", x.shape)
             x = i(x)
         
         return x #self.net(x)
@@ -54,7 +54,8 @@ class Model(nn.Module):
         super().__init__()
 
         # embed, In -> Out : J,C -> J,E
-        # self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, 64, embed_dim], normalize_input=True) # cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
+        #self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, 64, embed_dim], normalize_input=True)
+        #cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
         self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, embed_dim], normalize_input=False)
         # self.final = torch.nn.Tanh()
     def forward(self, x):

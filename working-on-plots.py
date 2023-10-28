@@ -14,6 +14,7 @@ def genhist(truthFileName, predictionFileName, plotname):
         nx = torch.Tensor(y_t[:,3])
         ny = torch.Tensor(y_t[:,4])
         nz = torch.Tensor(y_t[:,5])
+        pTTrue = torch.Tensor(y_t[:,8])
         eta = -torch.log(abs(torch.tan((1/2)*(torch.arctan2(nz,nx)))))
         etaTrue = torch.Tensor(eta)
         phi = (torch.arctan2(nz,ny))*(180/torch.pi)
@@ -22,44 +23,34 @@ def genhist(truthFileName, predictionFileName, plotname):
         # y_true = torch.stack((etatensor, phitensor), dim=1)
     
     with h5py.File(predictionFileName) as f:
-        y_p = np.array(f["angles"])
+        y_p = np.array(f["outputs"])
         eta = y_p[:,0] 
         etaPred = torch.Tensor(eta) #[mask])
         phi = y_p[:,1] 
         phiPred = torch.Tensor(phi) #[mask])
+        pTp = y_p[:,2]
+        pTPred = torch.Tensor(pTp)
         # y_pred = torch.Tensor()
         # y_pred = torch.stack((etatensor, phitensor), dim=1)
-    #tensortrue = f"{var}t"
-    #tensorpred = f"{var}pred"
     
     #make eta plot
-    plt.hist(phiTrue,bins=np.linspace(-200,50,50),histtype='step',label='phi truth')
-    plt.hist(phiPred,bins=np.linspace(-200,50,50),histtype='step',label='phi prediction')
+    #plt.hist(phiTrue,bins=np.linspace(-200,100,50),histtype='step',label='phi truth')
+    #plt.hist(phiPred,bins=np.linspace(-200,100,50),histtype='step',label='phi prediction')
     #plt.hist(etaTrue-etaPred, bins=np.linspace(-1,1,50), histtype='step', label='difference')
+    #plt.yscale('log')
+    #plt.xlabel(r'$\phi$ (deg)')
+    #plt.legend()
+    #plt.show()
+    #plt.savefig(f"{plotname}-ylocal-phi-02-log.png", format="png")
+
+    #make resolution plot
+    plt.hist(etaTrue,bins=np.linspace(-5,5,50),histtype='step',label='eta truth')
+    plt.hist((etaTrue-etaPred)/etaTrue, bins=np.linspace(-5, 5, 50), histtype='step', label='resolution eta')
     plt.yscale('log')
-    plt.xlabel(r'$\phi$ (deg)')
+    plt.xlabel(r'$\eta$')
     plt.legend()
     plt.show()
-    plt.savefig(f"{plotname}-ylocal-phi-01-log.png", format="png")
-    
-    #plt.hist(tensortrue,bins=np.linspace(-1,1,50),histtype='step',label='f"{var}" truth')
-    #plt.hist(tensorpred,bins=np.linspace(-1,1,50),histtype='step',label='f"{var}" prediction')
-    #plt.hist(etaTrue-etaPred, bins=np.linspace(-1,1,50), histtype='step', label='difference')
-    #plt.yscale('log')
-    #plt.xlabel(f"r'$\{var}$'")
-    #plt.legend()
-    #plt.show()
-    #plt.savefig(f"{plotname}-{var}-corrected-4.png", format="png")
-
-    #make phi plot
-    #plt.hist(phiTrue,bins=np.linspace(-1,1,50),histtype='step',label='phi truth')
-    #plt.hist(phiPred,bins=np.linspace(-1,1,50),histtype='step',label='phi prediction')
-    #plt.hist(phiTrue-phiPred, bins=np.linspace(-1,1,50), histtype='step', label='difference')
-    #plt.yscale('log')
-    #plt.xlabel(r'$\phi$')
-    #plt.legend()
-    #plt.show()
-    #plt.savefig(f"{plotname}-phi-corrected-3.png", format="png")
+    plt.savefig(f"{plotname}-ylocal-eta-02-res.png", format="png")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)

@@ -63,7 +63,7 @@ def loadDataFromH5(inFileName):
     eta = -torch.log(abs(torch.tan((1/2)*(torch.arctan2(nz,nx))))) #all negative values go to NaN w/np.log; abs value prevents this
     phi = (torch.arctan2(nz,ny))*(180/torch.pi)
 
-    #pT = y[:,8]
+    pT = torch.Tensor(y[:,8])
     
     # for 1D only the last time slice
     x = x[:,-1].reshape(x.shape[0], -1)
@@ -84,7 +84,7 @@ def loadDataFromH5(inFileName):
     x = torch.concatenate([xcluster, y_local], dim=1)
     e = torch.Tensor(eta) #[mask])
     p = torch.Tensor(phi)
-    y = torch.stack((e, p),dim=-1)
+    y = torch.stack((e, p, pT),dim=-1)
 
     return x, y 
     

@@ -32,7 +32,7 @@ class ModelLightning(pl.LightningModule):
         x = self(x)
 
         # compute loss
-        print(x.shape, y.shape)
+        #print(x.shape, y.shape)
         loss = self.loss(x, y)
 
         # log the loss

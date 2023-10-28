@@ -50,7 +50,7 @@ def evaluate(config):
                 
         # make output
         outData = {
-            "angles": angles #.numpy().flatten(), eliminated the flatten in the model as well # raw prediction
+            "outputs": outputs #.numpy().flatten(), eliminated the flatten in the model as well # raw prediction
         }
 
     # save final file
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     for inFileName in data:
 
         # make out file name and check if already exists
-        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model.h5")
+        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model_pTlabel.h5")
         if os.path.isfile(outFileName) and not ops.doOverwrite:
             print(f"File already exists not evaluating on: {outFileName}")
             continue
