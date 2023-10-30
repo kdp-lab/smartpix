@@ -46,7 +46,7 @@ def evaluate(config):
     outData = {}
     with torch.no_grad():
         
-        angles = model(x) # .to(config["device"]) # uncomment to use the gpu memory
+        outputs = model(x) # .to(config["device"]) # uncomment to use the gpu memory
                 
         # make output
         outData = {
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     for inFileName in data:
 
         # make out file name and check if already exists
-        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model_pTlabel.h5")
+        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model_pTlabel_morelayers.h5")
         if os.path.isfile(outFileName) and not ops.doOverwrite:
             print(f"File already exists not evaluating on: {outFileName}")
             continue

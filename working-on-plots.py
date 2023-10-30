@@ -44,13 +44,15 @@ def genhist(truthFileName, predictionFileName, plotname):
     #plt.savefig(f"{plotname}-ylocal-phi-02-log.png", format="png")
 
     #make resolution plot
-    plt.hist(etaTrue,bins=np.linspace(-5,5,50),histtype='step',label='eta truth')
-    plt.hist((etaTrue-etaPred)/etaTrue, bins=np.linspace(-5, 5, 50), histtype='step', label='resolution eta')
+    plt.hist(phiTrue,bins=np.linspace(-200,50,200),histtype='step',label='phi truth')
+    plt.hist(phiPred,bins=np.linspace(-200,50,200),histtype='step',label='phi prediction')
+    plt.hist(phiTrue-phiPred,bins=np.linspace(-200,50,200),histtype='step',label='phi difference')
+    plt.hist((phiTrue-phiPred)/phiTrue, bins=np.linspace(-200,50,200), histtype='step', label='resolution phi')
     plt.yscale('log')
-    plt.xlabel(r'$\eta$')
+    plt.xlabel('phi (deg)')
     plt.legend()
     plt.show()
-    plt.savefig(f"{plotname}-ylocal-eta-02-res.png", format="png")
+    plt.savefig(f"{plotname}-pTlayers-phi-01-compare-highbins.png", format="png")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)

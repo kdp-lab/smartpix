@@ -54,9 +54,9 @@ class Model(nn.Module):
         super().__init__()
 
         # embed, In -> Out : J,C -> J,E
-        #self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, 64, embed_dim], normalize_input=True)
-        #cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
-        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, embed_dim], normalize_input=False)
+        self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, 64, embed_dim], normalize_input=True)
+        cascade_dims(embed_input_dim, embed_dim, embed_nlayers)
+        #self.embed = DNN_block(embed_input_dim, embed_dim, [embed_input_dim, 64, embed_dim], normalize_input=False)
         # self.final = torch.nn.Tanh()
     def forward(self, x):
         x = self.embed(x)
