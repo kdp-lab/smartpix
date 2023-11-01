@@ -24,11 +24,11 @@ def genhist(truthFileName, predictionFileName, plotname):
     
     with h5py.File(predictionFileName) as f:
         y_p = np.array(f["outputs"])
-        eta = y_p[:,0] 
+        #eta = y_p[:,0] 
         etaPred = torch.Tensor(eta) #[mask])
-        phi = y_p[:,1] 
+        #phi = y_p[:,1] 
         phiPred = torch.Tensor(phi) #[mask])
-        pTp = y_p[:,2]
+        pTp = y_p[:,0]
         pTPred = torch.Tensor(pTp)
         # y_pred = torch.Tensor()
         # y_pred = torch.stack((etatensor, phitensor), dim=1)
@@ -44,15 +44,16 @@ def genhist(truthFileName, predictionFileName, plotname):
     #plt.savefig(f"{plotname}-ylocal-phi-02-log.png", format="png")
 
     #make resolution plot
-    plt.hist(phiTrue,bins=np.linspace(-200,50,200),histtype='step',label='phi truth')
-    plt.hist(phiPred,bins=np.linspace(-200,50,200),histtype='step',label='phi prediction')
-    plt.hist(phiTrue-phiPred,bins=np.linspace(-200,50,200),histtype='step',label='phi difference')
-    plt.hist((phiTrue-phiPred)/phiTrue, bins=np.linspace(-200,50,200), histtype='step', label='resolution phi')
+    plt.hist(pTTrue,bins=np.linspace(-2,2,200),histtype='step',label='pT truth') #, color="blue")
+    plt.hist(pTPred,bins=np.linspace(-2,2,200),histtype='step',label='pT prediction') #, color="green")
+    #plt.hist(pTTrue-pTPred,bins=np.linspace(-2,2,200),histtype='step',label='pT difference')
+    #plt.hist(((abs(pTTrue-pTPred))/pTTrue), bins=np.linspace(-5,5,50), histtype='step', label='resolution pT absvalue', color="red")
+    plt.hist(((pTTrue-pTPred)/pTTrue), bins=np.linspace(-2,2,200), histtype='step', label='resolution pT') #, color="purple")
     plt.yscale('log')
-    plt.xlabel('phi (deg)')
+    plt.xlabel('pT')
     plt.legend()
     plt.show()
-    plt.savefig(f"{plotname}-pTlayers-phi-01-compare-highbins.png", format="png")
+    plt.savefig(f"{plotname}-pTlayers-onlypT-01-compare-highbins.png", format="png")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)

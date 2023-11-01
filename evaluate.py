@@ -109,7 +109,7 @@ if __name__ == "__main__":
     for inFileName in data:
 
         # make out file name and check if already exists
-        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model_pTlabel_morelayers.h5")
+        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model_onlypTlabel_morelayers.h5")
         if os.path.isfile(outFileName) and not ops.doOverwrite:
             print(f"File already exists not evaluating on: {outFileName}")
             continue

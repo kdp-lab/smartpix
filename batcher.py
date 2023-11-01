@@ -84,7 +84,7 @@ def loadDataFromH5(inFileName):
     x = torch.concatenate([xcluster, y_local], dim=1)
     e = torch.Tensor(eta) #[mask])
     p = torch.Tensor(phi)
-    y = torch.stack((e, p, pT),dim=-1)
+    y = torch.Tensor(pT)
 
     return x, y 
     
