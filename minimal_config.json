@@ -6,7 +6,7 @@
       "embed_nlayers": 2
     },
     "weights": false,
-    "lr": 0.001
+    "lr": 0.01
   },
   "trainer": {
     "precision": 32,
