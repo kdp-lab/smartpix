@@ -4,12 +4,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
+import datetime
 import h5py
 import numpy as np
 from pytorch_lightning import LightningModule, Trainer
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
 import os
+
+import sys
+import glob
+sys.path.append("../")
+from convertEventFileToH5 import convertEventFileToH5
 
 # Define the CNN architecture
 class SimpleCNN(nn.Module):
@@ -44,25 +50,27 @@ class SimpleLightningModel(LightningModule):
     def forward(self, x):
         return self.model(x)
 
+    def step(self, batch, batch_idx, version):
+        x, y = batch
+        outputs = self(x)
+        loss = self.loss(outputs, y)
+        # log the loss
+        for key, val in loss.items():
+            self.log(f"{version}_{key}", val, prog_bar=(key=="loss"), on_step=True, logger=True)
+        return loss["loss"]
+
     def training_step(self, batch, batch_idx):
-        inputs, labels = batch
-        outputs = self(inputs)
-        loss = self.loss(outputs, labels.float())
-        self.log(f"loss", loss, prog_bar=True, on_step=True, logger=True)
-        return loss
+        return self.step(batch, batch_idx, "train")
 
-    def test_step(self, batch, batch_idx, dataloader_idx=0):
-        # This method specifies how a single batch should be processed during testing
-
-        inputs, labels = batch
-        outputs = self(inputs)
-
-        # Compute the loss (or any metric you are interested in)
-        loss = self.loss(outputs, labels)
-        return {'loss': loss, 'outputs': outputs, 'labels': labels}
+    def validation_step(self, batch, batch_idx):
+        return self.step(batch, batch_idx, "val")
     
     def loss(self, outputs, labels):
-        return F.mse_loss(outputs, labels.float())
+        # total loss
+        l = {}
+        l["mse"] = F.mse_loss(outputs, labels.float()) # F.mse_loss
+        l['loss'] = sum(l.values())
+        return l
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.001)
@@ -103,8 +111,13 @@ def train(model, train_dataloader, val_dataloader, checkpoint_dir="checkpoints",
     trainer.fit(model, train_dataloader, val_dataloader)
 
     # save model
-    trainer.save_checkpoint(os.path.join(checkpoint_dir,"finalWeights.ckpt"))
+    trainer.save_checkpoint(os.path.join(checkpoint_dir, "finalWeights.ckpt"))
     
+    # save the logged metrics
+    event_file_path = glob.glob(os.path.join(checkpoint_dir, "*/*/*events.out*"))[0]
+    hdf5_file_path = os.path.join(checkpoint_dir, "logged_metrics.h5")
+    convertEventFileToH5(event_file_path, hdf5_file_path)
+
     return trainer
 
 if __name__ == "__main__":
@@ -142,10 +155,16 @@ if __name__ == "__main__":
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size = 0.25)
     train_dataloader = DataLoader(TensorDataset(x, y), shuffle=True, num_workers=4, batch_size=256)
     val_dataloader = DataLoader(TensorDataset(x, y), shuffle=True, num_workers=4, batch_size=256)
+    
+    # make checkpoint dir
+    checkpoint_dir = os.path.join(ops.outDir, f'training_{datetime.datetime.now().strftime("%Y.%m.%d.%H.%M.%S")}')
+    print(f"Saving checkpoints to: {checkpoint_dir}")
+    if not os.path.isdir(checkpoint_dir):
+        os.makedirs(checkpoint_dir)
 
     # Create an instance of the LightningModule
     model = SimpleLightningModel()
-    trainer = train(model, train_dataloader, val_dataloader, ops.outDir, max_epochs=ops.max_epochs, max_steps=ops.max_steps)
+    trainer = train(model, train_dataloader, val_dataloader, checkpoint_dir, ops.max_epochs, ops.max_steps)
 
     # Set the model to evaluation mode
     model.eval()
@@ -153,7 +172,8 @@ if __name__ == "__main__":
         outputs = model(x).cpu().numpy()
     labels = y.cpu().numpy()
     # Save evaluation results to an HDF5 file
-    with h5py.File('evaluation_results.h5', 'w') as f:
+    outFileName = os.path.join(checkpoint_dir, 'evaluation_results.h5')
+    with h5py.File(outFileName, 'w') as f:
         f.create_dataset('outputs', data=outputs)
         f.create_dataset('labels', data=labels)
 

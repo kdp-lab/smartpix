@@ -1,9 +1,10 @@
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 # Load data from the HDF5 file
-with h5py.File('evaluation_results.h5', 'r') as f:
+with h5py.File(sys.argv[1], 'r') as f:
     labels = np.array(f['labels'])
     outputs = np.array(f['outputs'])
 
