@@ -17,6 +17,9 @@ import glob
 sys.path.append("../")
 from convertEventFileToH5 import convertEventFileToH5
 
+def print_size_hook(module, input, output):
+    print(f"{module.__class__.__name__}: Input size: {input[0].size()}, Output size: {output.size()}")
+
 # Define the CNN architecture
 class SimpleCNN(nn.Module):
     def __init__(self):
@@ -29,23 +32,24 @@ class SimpleCNN(nn.Module):
 
     def forward(self, x):
         x = x.view(-1, 1, 13, 21)  # Add channel dimension for grayscale image
-        #print(x.shape)
         x = self.pool(F.relu(self.conv1(x)))
-        #print(x.shape)
         x = self.pool(F.relu(self.conv2(x)))
-        #print(x.shape)
         x = x.view(-1, 64 * 3 * 5)  # Adjust based on your input size
-        #print(x.shape)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
-        x = x.flatten()
+        # x = x.flatten()
         return x
 
 # Define the LightningModule
 class SimpleLightningModel(LightningModule):
-    def __init__(self):
+    def __init__(self, debug=False):
         super(SimpleLightningModel, self).__init__()
         self.model = SimpleCNN()  # Assume you have a SimpleCNN model
+
+        # Register the hook
+        if debug:
+            for layer in self.model.children():
+                layer.register_forward_hook(print_size_hook)
 
     def forward(self, x):
         return self.model(x)
@@ -84,6 +88,7 @@ def options():
     parser.add_argument("-s", "--max_steps", help="Max number of steps to train on", default=-1, type=int)
     parser.add_argument("-d", "--device", help="Device to use.", default=None)
     parser.add_argument("-w", "--weights", help="Initial weights.", default=None)
+    parser.add_argument("--debug", help="Print out the size after each layer", action="store_true")
     return parser.parse_args()
 
 def train(model, train_dataloader, val_dataloader, checkpoint_dir="checkpoints", max_epochs=10, max_steps=-1):
@@ -151,7 +156,7 @@ if __name__ == "__main__":
 
     # convert to tensor
     x = torch.Tensor(x) #[mask])
-    y = torch.Tensor(cotBeta) #[mask])
+    y = torch.Tensor(cotBeta).reshape(-1,1) #[mask])
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size = 0.25)
     train_dataloader = DataLoader(TensorDataset(x, y), shuffle=True, num_workers=4, batch_size=256)
     val_dataloader = DataLoader(TensorDataset(x, y), shuffle=True, num_workers=4, batch_size=256)
@@ -163,7 +168,13 @@ if __name__ == "__main__":
         os.makedirs(checkpoint_dir)
 
     # Create an instance of the LightningModule
-    model = SimpleLightningModel()
+    model = SimpleLightningModel(ops.debug)
+    
+    # Register the hook
+    # for layer in model.children():
+    #     layer.register_forward_hook(print_size_hook)
+    
+    # train model
     trainer = train(model, train_dataloader, val_dataloader, checkpoint_dir, ops.max_epochs, ops.max_steps)
 
     # Set the model to evaluation mode
