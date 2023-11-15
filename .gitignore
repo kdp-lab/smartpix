@@ -3,3 +3,6 @@ data*
 checkpoints/
 __pycache__/
 .ipynb_checkpoints/
+
+# files
+*.pdf
