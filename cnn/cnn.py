@@ -28,7 +28,7 @@ class SimpleCNN(nn.Module):
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
         self.fc1 = nn.Linear(64 * 3 * 5, 128)  # Adjust based on your input size
-        self.fc2 = nn.Linear(128, 1)  # Adjust output size based on your task
+        self.fc2 = nn.Linear(128, 3)  # Adjust output size based on your task
 
     def forward(self, x):
         x = x.view(-1, 1, 13, 21)  # Add channel dimension for grayscale image
@@ -135,28 +135,24 @@ if __name__ == "__main__":
         x = np.array(f["data"])
         y = np.array(f["labels"])
 
-    # the labels are x-entry, y-entry, z-entry, n_x, n_y, n_z, number_eh_pairs, y-local, pt
-    # taken from https://zenodo.org/record/7331128
-    # other relevant parameters to compute are https://github.com/kdipetri/semiparametric/blob/master/processing/datagen.py#L110C9-L115C95
-    # cotAlpha = y[:,3]/y[:,5] # n_x/n_z
-    cotBeta = y[:,4]/y[:,5] # n_y/n_z
-    # cotBeta = abs(cotBeta)
-    # sensor_thickness = 100 #um
-    # x_midplane = y[:,0] + cotBeta*(sensor_thickness/2 - y[:,2]) # x-entry + cotAlpha*(sensor_thickness/2 - z-entry)
-    # y_midplane = y[:,1] + cotBeta*(sensor_thickness/2 - y[:,2]) # y-entry + cotBeta*(sensor_thickness/2 - z-entry)
-    y_local = y[:,7]
-
+    # x_entry = y[:,0]
+    # y_entry = y[:,1]
+    # z_entry = y[:,2]
+    nx = y[:,3]
+    ny = y[:,4]
+    nz = y[:,5]
+    # number_eh_pairs = y[:,6]
+    ylocal = y[:,7]
+    pT = y[:,8]
+    eta = -np.log(abs(np.tan((1/2)*(np.arctan2(nz,nx))))) #theta = alpha;all negative values go to NaN w/np.log; abs value prevents this # cotAlpha = nx/nz
+    phi = (np.arctan2(nz,ny)) #to degrees *(180/torch.pi) # phi=beta # cotBeta = ny/nz
+    y = torch.Tensor(np.stack([eta,phi,pT],axis=-1))
+    
     x = x[:,-1]
     # form final input
     # x = np.concatenate([x, y_local.reshape(-1,1)],-1)
-
-    # event selection
-    # mask = abs(y[:,8]) >= 0.3 # pt>0.3 GeV
-    # print(mask.sum()/mask.shape[0])
-
-    # convert to tensor
     x = torch.Tensor(x) #[mask])
-    y = torch.Tensor(cotBeta).reshape(-1,1) #[mask])
+
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size = 0.25)
     train_dataloader = DataLoader(TensorDataset(x, y), shuffle=True, num_workers=4, batch_size=256)
     val_dataloader = DataLoader(TensorDataset(x, y), shuffle=True, num_workers=4, batch_size=256)
@@ -169,11 +165,7 @@ if __name__ == "__main__":
 
     # Create an instance of the LightningModule
     model = SimpleLightningModel(ops.debug)
-    
-    # Register the hook
-    # for layer in model.children():
-    #     layer.register_forward_hook(print_size_hook)
-    
+        
     # train model
     trainer = train(model, train_dataloader, val_dataloader, checkpoint_dir, ops.max_epochs, ops.max_steps)
 
