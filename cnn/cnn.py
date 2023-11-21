@@ -24,20 +24,24 @@ def print_size_hook(module, input, output):
 class SimpleCNN(nn.Module):
     def __init__(self):
         super(SimpleCNN, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=2)
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=7, stride=1, padding=3)
         self.bn1 = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.bn2 = nn.BatchNorm2d(64)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.fc1 = nn.Linear(64*6*10, 128)  # Adjust based on your input size # 64 * 3 * 5
+        self.fc1 = nn.Linear(1+64*6*10, 128)  # Adjust based on your input size # 64 * 3 * 5
         self.fc2 = nn.Linear(128, 3)  # Adjust output size based on your task
 
-    def forward(self, x):
+    def forward(self, x, c):
+        # process the image
         x = x.view(-1, 1, 13, 21)  # Add channel dimension for grayscale image
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = self.pool(x)
         x = x.view(x.shape[0], -1) #-1, 64 * 3 * 5)  # Adjust based on your input size
+        # append event variables (class token)
+        x = torch.cat([x,c],-1)
+        # feed forward
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         # x = x.flatten()
@@ -54,12 +58,12 @@ class SimpleLightningModel(LightningModule):
             for layer in self.model.children():
                 layer.register_forward_hook(print_size_hook)
 
-    def forward(self, x):
-        return self.model(x)
+    def forward(self, x, c):
+        return self.model(x, c)
 
     def step(self, batch, batch_idx, version):
-        x, y = batch
-        outputs = self(x)
+        x, c, y = batch
+        outputs = self(x, c)
         loss = self.loss(outputs, y)
         # log the loss
         for key, val in loss.items():
@@ -80,12 +84,12 @@ class SimpleLightningModel(LightningModule):
         return l
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.001)
+        return torch.optim.Adam(self.parameters(), lr=0.0005)
 
 def options():
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-c", "--config_file", help="Configuration file.", default="./minimal_config.json")
-    parser.add_argument("-i",  "--inFileName", default=None, help="Input data file")
+    parser.add_argument("-i",  "--inFileName", default=None, help="Input data file", nargs="+")
     parser.add_argument("-o", "--outDir", help="File name of the output directory", default="./checkpoints")
     parser.add_argument("-e", "--max_epochs", help="Max number of epochs to train on", default=None, type=int)
     parser.add_argument("-s", "--max_steps", help="Max number of steps to train on", default=-1, type=int)
@@ -102,7 +106,7 @@ def train(model, train_dataloader, val_dataloader, checkpoint_dir="checkpoints",
     # callbacks
     callbacks = [
         ModelCheckpoint(monitor="train_loss", dirpath=checkpoint_dir, filename='cp-{epoch:04d}-{step}', every_n_train_steps = 1, save_top_k=20), # 0=no models, -1=all models, N=n models, set save_top_k=-1 to save all checkpoints
-        EarlyStopping(monitor="val_loss_epoch", min_delta=0.001, patience=5, verbose=True, mode='min'),
+        EarlyStopping(monitor="val_loss_epoch", min_delta=0.001, patience=10, verbose=True, mode='min'),
     ]
 
     # torch lightning trainer
@@ -129,37 +133,56 @@ def train(model, train_dataloader, val_dataloader, checkpoint_dir="checkpoints",
 
     return trainer
 
+def loadData(fileList):
+    
+    # make sure its a list of strings
+    fileList = [fileList] if isinstance(fileList, str) else fileList
+
+    # load data
+    x, c, y = None, None, None
+    for inFileName in fileList: 
+        # load in the data
+        with h5py.File(inFileName) as f:
+            d = np.array(f["data"])
+            l = np.array(f["labels"])
+        # variables
+        nx = l[:,3]
+        ny = l[:,4]
+        nz = l[:,5]
+        # number_eh_pairs = y[:,6]
+        ylocal = l[:,7]
+        pT = l[:,8]
+        eta = -np.log(abs(np.tan((1/2)*(np.arctan2(nz,nx))))) #theta = alpha;all negative values go to NaN w/np.log; abs value prevents this # cotAlpha = nx/nz
+        phi = (np.arctan2(nz,ny)) #to degrees *(180/torch.pi) # phi=beta # cotBeta = ny/nz
+        y_temp = np.stack([eta,phi,pT],axis=-1)
+
+        x_temp = d[:,-1]
+        c_temp = np.stack([ylocal], axis=-1)
+
+        if isinstance(x, np.ndarray):
+            x = np.concatenate([x,x_temp],0)
+            c = np.concatenate([c,c_temp],0)
+            y = np.concatenate([y,y_temp],0)
+        else:
+            x = x_temp
+            c = c_temp
+            y = y_temp
+    print(x.shape, c.shape, y.shape)
+    x = torch.Tensor(x)
+    c = torch.Tensor(c)
+    y = torch.Tensor(y)
+    return x,c,y
+
 if __name__ == "__main__":
     
     # options
     ops = options()
     
-    # load in the data
-    with h5py.File(ops.inFileName) as f:
-        x = np.array(f["data"])
-        y = np.array(f["labels"])
-
-    # x_entry = y[:,0]
-    # y_entry = y[:,1]
-    # z_entry = y[:,2]
-    nx = y[:,3]
-    ny = y[:,4]
-    nz = y[:,5]
-    # number_eh_pairs = y[:,6]
-    ylocal = y[:,7]
-    pT = y[:,8]
-    eta = -np.log(abs(np.tan((1/2)*(np.arctan2(nz,nx))))) #theta = alpha;all negative values go to NaN w/np.log; abs value prevents this # cotAlpha = nx/nz
-    phi = (np.arctan2(nz,ny)) #to degrees *(180/torch.pi) # phi=beta # cotBeta = ny/nz
-    y = torch.Tensor(np.stack([eta,phi,pT],axis=-1))
-    
-    x = x[:,-1]
-    # form final input
-    # x = np.concatenate([x, y_local.reshape(-1,1)],-1)
-    x = torch.Tensor(x) #[mask])
-
-    x_train, x_val, y_train, y_val = train_test_split(x, y, test_size = 0.25)
-    train_dataloader = DataLoader(TensorDataset(x, y), shuffle=True, num_workers=4, batch_size=256)
-    val_dataloader = DataLoader(TensorDataset(x, y), shuffle=True, num_workers=4, batch_size=256)
+    # load data
+    x,c,y = loadData(ops.inFileName)
+    x_train, x_val, c_train, c_val, y_train, y_val = train_test_split(x, c, y, test_size = 0.25)
+    train_dataloader = DataLoader(TensorDataset(x_train, c_train, y_train), shuffle=True, num_workers=4, batch_size=256)
+    val_dataloader = DataLoader(TensorDataset(x_val, c_val, y_val), shuffle=False, num_workers=4, batch_size=256)
     
     # make checkpoint dir
     checkpoint_dir = os.path.join(ops.outDir, f'training_{datetime.datetime.now().strftime("%Y.%m.%d.%H.%M.%S")}')
@@ -175,8 +198,9 @@ if __name__ == "__main__":
 
     # Set the model to evaluation mode
     model.eval()
+    x,c,y = loadData(ops.inFileName[0])
     with torch.no_grad():
-        outputs = model(x).cpu().numpy()
+        outputs = model(x,c).cpu().numpy()
     labels = y.cpu().numpy()
     # Save evaluation results to an HDF5 file
     outFileName = os.path.join(checkpoint_dir, 'evaluation_results.h5')
