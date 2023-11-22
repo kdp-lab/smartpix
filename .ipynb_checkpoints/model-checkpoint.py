@@ -24,6 +24,8 @@ class ModelLightning(pl.LightningModule):
     def forward(self, x):
         x = self.model(x)
         return x
+        print("forward shapes")
+        print(x.shape, y.shape)
         
     def step(self, batch, batch_idx, version):
         
@@ -32,6 +34,7 @@ class ModelLightning(pl.LightningModule):
         x = self(x)
 
         # compute loss
+        #print(x.shape, y.shape)
         loss = self.loss(x, y)
 
         # log the loss
@@ -67,7 +70,7 @@ class ModelLightning(pl.LightningModule):
 
         # total loss
         l = {}
-        l["mse"] = torch.nn.functional.mse_loss(yhat.flatten(), y) # torch.mean((yhat.flatten()-y)**2) need to be vary careful about the dimensions so letting torch handle it 
+        l["mse"] = torch.nn.functional.mse_loss(yhat, y) # torch.mean((yhat.flatten()-y)**2) need to be vary careful about the dimensions so letting torch handle it 
         # l["mae"] = torch.mean(torch.abs(yhat-y))
 
         # get total
