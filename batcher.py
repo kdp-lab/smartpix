@@ -43,6 +43,10 @@ def loadDataFromH5(inFileName):
     with h5py.File(inFileName) as f:
         x = np.array(f["data"])
         y = np.array(f["labels"])
+
+    print("lengths x, y")
+    print(len(x), len(y))
+
     
     # the labels are x-entry, y-entry, z-entry, n_x, n_y, n_z, number_eh_pairs, y-local, pt
     # taken from https://zenodo.org/record/7331128
@@ -81,7 +85,8 @@ def loadDataFromH5(inFileName):
     xcluster = torch.Tensor(x)#[mask])
     print(xcluster.shape)
     print(y_local.shape)
-    x = torch.concatenate([xcluster, y_local], dim=1)
+    #x = torch.concatenate([xcluster, y_local], dim=1)
+    x = torch.Tensor(xcluster)
     e = torch.Tensor(eta) #[mask])
     p = torch.Tensor(phi)
     y = torch.stack((e, p), dim=1)
