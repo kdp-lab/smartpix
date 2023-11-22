@@ -5,6 +5,7 @@ import h5py
 import numpy as np
 import argparse
 
+#import data
 def genhist(truthFileName, predictionFileName, plotname):
     with h5py.File(truthFileName) as f:
         y_t = np.array(f["labels"])
@@ -32,15 +33,12 @@ def genhist(truthFileName, predictionFileName, plotname):
 
     #make resolution plot
     plt.hist(etaTrue,bins=np.linspace(-4,4,200),histtype='step',label='eta') #, color="blue")
-    plt.hist(phiTrue,bins=np.linspace(-4,4,200),histtype='step',label='phi') #, color="blue")
-    plt.hist(pTTrue,bins=np.linspace(-4,4,200),histtype='step',label='pT') #, color="blue")
+    plt.hist(phiTrue,bins=np.linspace(-4,4,200),histtype='step',label='phi')
+    plt.hist(pTTrue,bins=np.linspace(-4,4,200),histtype='step',label='pT')
     #plt.hist(pTPred,bins=np.linspace(-1,2,200),histtype='step',label='pT prediction') #, color="green")
     #plt.hist(etaTrue-etaPred,bins=np.linspace(-5,5,100),histtype='step',label='pT difference')
     #plt.hist(((abs(etaTrue-etaPred))/etaTrue), bins=np.linspace(-5,5,50), histtype='step', label='resolution eta absvalue')#, color="red")
     #plt.hist(((pTTrue-pTPred)/pTTrue), bins=np.linspace(-1,2,200), histtype='step', label='pT resolution') #, color="purple")
-    
-    #make comparison plot
-    #plt.scatter(((phiTrue-phiWOPred)/phiTrue), pTTrue)# bins=np.linspace(-0.5,0.5,200), histtype='step', label='without pT label')
 
     plt.yscale('log')
     plt.xlabel('truth value eta, phi (rad), pT (GeV)')
@@ -54,9 +52,7 @@ if __name__ == "__main__":
     #parser.add_argument("-h", default=None, help="help")
     parser.add_argument("-t",  "--truthFileName", default=None, help="Input file for truths")
     parser.add_argument("-p",  "--predictionFileName", default=None, help="Input file for predictions")
-    #parser.add_argument("-wo", "--withoutlabelFileName", default=None, help="Input file for predictions without pT labels")
     parser.add_argument("-n", "--plotname", default="plot", help="Name of resulting plot")
-    #parser.add_argument("-v", "--var", default="eta", help="eta or phi variable?")
     ops = parser.parse_args()
 
-    genhist(ops.truthFileName, ops.predictionFileName, ops.plotname) # ops.withoutlabelFileName, 
+    genhist(ops.truthFileName, ops.predictionFileName, ops.plotname)
