@@ -46,11 +46,11 @@ def evaluate(config):
     outData = {}
     with torch.no_grad():
         
-        y_hat = model(x) # .to(config["device"]) # uncomment to use the gpu memory
+        outputs = model(x) # .to(config["device"]) # uncomment to use the gpu memory
                 
         # make output
         outData = {
-            "y_hat": y_hat.numpy().flatten(), # raw prediction
+            "outputs": outputs #.numpy().flatten(), eliminated the flatten in the model as well # raw prediction
         }
 
     # save final file
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     for inFileName in data:
 
         # make out file name and check if already exists
-        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model.h5")
+        outFileName = os.path.join(outDir, os.path.basename(inFileName)).replace(".h5","_Model_0.01lr-32b-cluster_angles.h5")
         if os.path.isfile(outFileName) and not ops.doOverwrite:
             print(f"File already exists not evaluating on: {outFileName}")
             continue

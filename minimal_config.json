@@ -2,15 +2,16 @@
   "model": {
     "model_config": {
       "embed_input_dim": 273,
-      "embed_dim": 1,
+      "embed_dim": 2,
       "embed_nlayers": 2
     },
     "weights": false,
-    "lr": 0.001
+    "lr": 0.01
   },
   "trainer": {
     "precision": 32,
     "gradient_clip_val": 0.1
   },
   "batch_size": 32
+
 }
