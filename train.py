@@ -10,6 +10,7 @@ import os
 import datetime
 import json
 import argparse
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0" 
 import torch
 import h5py
 import glob
@@ -29,7 +30,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-c", "--config_file", help="Configuration file.", default="./minimal_config.json")
     parser.add_argument("-i",  "--inFileName", default=None, help="Input data file")
-    parser.add_argument("-o", "--outDir", help="File name of the output directory", default="./checkpoints")
+    parser.add_argument("-o", "--outDir", help="File name of the output directory", default="/data/ckumar/checkpoints")
     parser.add_argument("-e", "--max_epochs", help="Max number of epochs to train on", default=None, type=int)
     parser.add_argument("-s", "--max_steps", help="Max number of steps to train on", default=-1, type=int)
     parser.add_argument("-d", "--device", help="Device to use.", default=None)
@@ -52,6 +53,7 @@ if __name__ == "__main__":
 
     # load and split
     x, y = loadDataFromH5(ops.inFileName)
+    print(x.shape)
     # x, y = loadDataFromPd()
     # x, y = x[:100], abs(y[:100])
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size = 0.25)
