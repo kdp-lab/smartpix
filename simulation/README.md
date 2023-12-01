@@ -1,4 +1,4 @@
-# darkQCD_pythia_simulations
+# simulations for smart pixels
 
 # setup environment
 ```
