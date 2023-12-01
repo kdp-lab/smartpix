@@ -14,7 +14,7 @@ import os
 
 import sys
 import glob
-sys.path.append("../")
+sys.path.append("../utils")
 from convertEventFileToH5 import convertEventFileToH5
 
 def print_size_hook(module, input, output):
