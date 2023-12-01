@@ -2,6 +2,7 @@
 checkpoints/
 __pycache__/
 .ipynb_checkpoints/
+bin/
 
 # files
 *.pdf
