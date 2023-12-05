@@ -7,3 +7,4 @@ bin/
 # files
 *.pdf
 *.h5
+*.root
