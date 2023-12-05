@@ -129,8 +129,8 @@ int main(int argc, char* argv[]) {
       pythia.readString("PhaseSpace:bias2SelectionRef = 20.");
     }
 
-    // Initialize for LHC at 14 TeV.
-    pythia.readString("Beams:eCM = 14000.");
+    // Initialize for LHC at 13.6 TeV
+    pythia.readString("Beams:eCM = 13600.");
     pythia.init();
     
     // Shorthand for the event record in pythia.
