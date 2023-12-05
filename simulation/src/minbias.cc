@@ -16,6 +16,7 @@
 #include "Pythia8/Pythia.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "Pythia8Plugins/HepMC3.h"
 
 // declare pythia8 namespace
 using namespace Pythia8;
@@ -71,8 +72,14 @@ int main(int argc, char* argv[]) {
   TFile* f = new TFile(outFileName.c_str(),"RECREATE");
   TTree* t = new TTree("t","t");
 
+  // Interface for conversion from Pythia8::Event to HepMC event.
+  HepMC3::Pythia8ToHepMC3 toHepMC;
+  // Specify file where HepMC events will be stored.
+  HepMC3::WriterAscii ascii_io("test.hepmc");
+
   // initialize branches variables
   int nParticles;
+  double weight;
   std::vector<int> *id = 0;
   std::vector<int> *status = 0;
   std::vector<double> *mass = 0;
@@ -87,17 +94,18 @@ int main(int argc, char* argv[]) {
 
   // initialize branches
   t->Branch("nParticles", &nParticles);
+  t->Branch("weight", &weight);
   t->Branch("id", &id);
   t->Branch("status", &status);
   t->Branch("mass", &mass);
   t->Branch("pt", &pt);
   t->Branch("eta", &eta);
   t->Branch("phi", &phi);
-  t->Branch("tau",&tau);
-  t->Branch("xDec",&xDec);
-  t->Branch("yDec",&yDec);
-  t->Branch("zDec",&zDec);
-  t->Branch("tDec",&tDec);
+  t->Branch("tau", &tau);
+  t->Branch("xDec", &xDec);
+  t->Branch("yDec", &yDec);
+  t->Branch("zDec", &zDec);
+  t->Branch("tDec", &tDec);
 
   // time keeper for progress bar
   std::chrono::time_point<std::chrono::system_clock> time_start;
@@ -140,6 +148,15 @@ int main(int argc, char* argv[]) {
 
       if(!pythia.next()) continue;
 
+      // Construct new empty HepMC event and fill it.
+      // Default units are ( HepMC3::Units::GEV, HepMC3::Units::MM)
+      // but can be changed in the GenEvent constructor.
+      HepMC3::GenEvent hepmcevt;
+      toHepMC.fill_next_event( pythia, &hepmcevt );
+
+      // Write the HepMC event to file.
+      ascii_io.write_event(hepmcevt);
+
       // progress bar
       elapsed_seconds = (std::chrono::system_clock::now() - time_start);
       pbftp(elapsed_seconds.count(), iE, maxEvents);
@@ -159,7 +176,8 @@ int main(int argc, char* argv[]) {
       
       // get event level information
       nParticles = event.size();
-    
+      weight = info.weight();
+
       // loop over the particles. available properties listed here https://pythia.org/latest-manual/ParticleProperties.html
       for(int iP=0; iP<nParticles; iP++){
 
@@ -180,6 +198,8 @@ int main(int argc, char* argv[]) {
       // fill tree on each particle loop
       t->Fill();
     }
+    
+    pythia.stat();
   } 
 
   // write and cleanup

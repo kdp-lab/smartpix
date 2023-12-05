@@ -30,7 +30,7 @@ $(PYTHIA):
 
 # higgs portal
 minbias: $(PYTHIA) src/$$@.cc
-	$(CXX) src/$@.cc -o bin/$@.exe -w $(CXX_COMMON) $(ROOT_LIB) -ldl $(ROOT)
+	$(CXX) src/$@.cc -o bin/$@.exe -w $(CXX_COMMON) $(ROOT_LIB) -ldl $(ROOT) $(HEPMC3_INCLUDE) $(HEPMC3_LIB) -DHEPMC3
 
 # clean working dir
 clean:

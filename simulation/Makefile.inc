@@ -35,11 +35,11 @@ HEPMC2_BIN=
 HEPMC2_INCLUDE=
 HEPMC2_LIB=
 
-HEPMC3_USE=false
-HEPMC3_CONFIG=
-HEPMC3_BIN=
-HEPMC3_INCLUDE=
-HEPMC3_LIB=
+HEPMC3_USE=true
+HEPMC3_CONFIG=HepMC3-config
+HEPMC3_BIN=/home/abadea/hepmc3.2.6/install/bin/
+HEPMC3_INCLUDE=-I/home/abadea/hepmc3.2.6/install/include
+HEPMC3_LIB=-L/home/abadea/hepmc3.2.6/install/lib64 -Wl,-rpath,/home/abadea/hepmc3.2.6/install/lib64 -lHepMC3
 
 LHAPDF5_USE=false
 LHAPDF5_CONFIG=
