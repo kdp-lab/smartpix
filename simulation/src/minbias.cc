@@ -53,7 +53,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   // read in user parameters
-  // std::string pythiaCard = argv[1];
   std::string outFileName = argv[1];
   int maxEvents = std::stoi(argv[2]);
 
@@ -69,13 +68,13 @@ int main(int argc, char* argv[]) {
   double pTlimitTwo[3] = {0., 20., 100.};
 
   // Create root file and tree
-  TFile* f = new TFile(outFileName.c_str(),"RECREATE");
+  TFile* f = new TFile((outFileName + ".root").c_str(),"RECREATE");
   TTree* t = new TTree("t","t");
 
   // Interface for conversion from Pythia8::Event to HepMC event.
   HepMC3::Pythia8ToHepMC3 toHepMC;
   // Specify file where HepMC events will be stored.
-  HepMC3::WriterAscii ascii_io("test.hepmc");
+  HepMC3::WriterAscii ascii_io((outFileName + ".hepmc").c_str());
 
   // initialize branches variables
   int nParticles;

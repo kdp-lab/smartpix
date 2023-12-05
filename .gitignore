@@ -8,3 +8,4 @@ bin/
 *.pdf
 *.h5
 *.root
+*.hepmc
