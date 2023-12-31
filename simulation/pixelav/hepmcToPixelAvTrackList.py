@@ -26,26 +26,28 @@ if __name__ == "__main__":
             # loop over particles
             print(len(event.particles))
             for particle in event.particles:
-                print(particle)
                 
                 # # to get the production vertex and position
-                # prod_vertex = particle.production_vertex
-                # prod_vector = prod_vertex.position
+                prod_vertex = particle.production_vertex
+                prod_vector = prod_vertex.position
                 
                 # # to get the decay vertex
                 # decay_vertex = particle.end_vertex
                 # decay_vector = decay_vertex.position
                 
-                # save kinematics
-                # print(particle.id, particle.status, particle.momentum.pt(), particle.momentum.eta(), particle.momentum.phi())
+                # decide which particles to keep
+                accept = (particle.status > 9) * (abs(particle.momentum.eta()) != float("inf"))
+                print(particle.id, particle.pid, particle.status, particle.momentum.pt(), particle.momentum.eta(), particle.momentum.phi(), accept)
+                if not accept:
+                    continue
 
                 # track properties
-                cotb = 0 # particle.momentum.eta()
+                cotb = particle.momentum.eta()
                 cota = particle.momentum.phi()
                 p = particle.momentum.p3mod()
                 flp = 0
-                localx = 0
-                localy = 0
+                localx = prod_vector[0] # this needs to be particle position at start of pixel detector or only save particles that are produced within epsilon distance of detector
+                localy = prod_vector[1]
                 pT = particle.momentum.pt()
                 tracks.append([cotb, cota, p, flp, localx, localy, pT])
             break
