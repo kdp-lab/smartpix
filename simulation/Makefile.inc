@@ -3,14 +3,14 @@
 # --with-root=/cvmfs/sft.cern.ch/lcg/releases/LCG_104b_ATLAS_2/ROOT/6.28.08/x86_64-centos7-gcc11-opt
 
 # Install directory prefixes.
-PREFIX=/home/abadea/pythia8307
+PREFIX=/opt
 PREFIX_BIN=$(PREFIX)/bin
 PREFIX_INCLUDE=$(PREFIX)/include
 PREFIX_LIB=$(PREFIX)/lib
 PREFIX_SHARE=$(PREFIX)/share/Pythia8
 
 # Compilation flags (see ./configure --help for further documentation).
-CXX=/cvmfs/sft.cern.ch/lcg/releases/gcc/11.3.0-ad0f5/x86_64-centos7/bin/g++
+CXX=g++
 CXX_COMMON=-O2 -std=c++11 -pedantic -W -Wall -Wshadow -fPIC -pthread
 CXX_SHARED=-shared
 CXX_SONAME=-Wl,-soname,
@@ -37,9 +37,9 @@ HEPMC2_LIB=
 
 HEPMC3_USE=true
 HEPMC3_CONFIG=HepMC3-config
-HEPMC3_BIN=/home/abadea/hepmc3.2.6/install/bin/
-HEPMC3_INCLUDE=-I/home/abadea/hepmc3.2.6/install/include
-HEPMC3_LIB=-L/home/abadea/hepmc3.2.6/install/lib64 -Wl,-rpath,/home/abadea/hepmc3.2.6/install/lib64 -lHepMC3
+HEPMC3_BIN=/opt/bin/
+HEPMC3_INCLUDE=-I/opt/include
+HEPMC3_LIB=-L/opt/lib64 -Wl,-rpath,/opt/lib64 -lHepMC3 -DHEPMC3
 
 LHAPDF5_USE=false
 LHAPDF5_CONFIG=
@@ -67,9 +67,9 @@ RIVET_LIB=
 
 ROOT_USE=true
 ROOT_CONFIG=root-config
-ROOT_BIN=/cvmfs/sft.cern.ch/lcg/releases/ROOT/6.28.08-2a100/x86_64-centos7-gcc11-opt/bin/
-ROOT_INCLUDE=-I/cvmfs/sft.cern.ch/lcg/releases/ROOT/6.28.08-2a100/x86_64-centos7-gcc11-opt/include
-ROOT_LIB=-L/cvmfs/sft.cern.ch/lcg/releases/ROOT/6.28.08-2a100/x86_64-centos7-gcc11-opt/lib -Wl,-rpath,/cvmfs/sft.cern.ch/lcg/releases/ROOT/6.28.08-2a100/x86_64-centos7-gcc11-opt/lib -lCore
+ROOT_BIN=/opt/root/bin/
+ROOT_INCLUDE=-I/opt/root/include
+ROOT_LIB=-L/opt/root/lib -Wl,-rpath,/opt/root/lib -lCore
 
 GZIP_USE=false
 GZIP_CONFIG=

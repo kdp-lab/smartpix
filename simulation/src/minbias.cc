@@ -2,8 +2,6 @@
 
   Authors: 
   Anthony Badea
-  Jennet Dickinson
-  Karri DiPetrillo
 
   Description:
   Script to generate minbias pythia samples
@@ -63,9 +61,9 @@ int main(int argc, char* argv[]) {
   Settings& settings = pythia.settings;
   const Info& info = pythia.info;
   // number of bins
-  int nBin = 2;
+  int nBin = 11;
   // set up pT bins
-  double pTlimitTwo[3] = {0., 20., 100.};
+  double pTlimitTwo[12] = {0., 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 50.};
 
   // Create root file and tree
   TFile* f = new TFile((outFileName + ".root").c_str(),"RECREATE");
@@ -81,6 +79,7 @@ int main(int argc, char* argv[]) {
   double weight;
   std::vector<int> *id = 0;
   std::vector<int> *status = 0;
+  std::vector<int> *statusHepMC = 0;
   std::vector<double> *mass = 0;
   std::vector<double> *pt = 0;
   std::vector<double> *eta = 0;
@@ -96,6 +95,7 @@ int main(int argc, char* argv[]) {
   t->Branch("weight", &weight);
   t->Branch("id", &id);
   t->Branch("status", &status);
+  t->Branch("statusHepMC", &statusHepMC);
   t->Branch("mass", &mass);
   t->Branch("pt", &pt);
   t->Branch("eta", &eta);
@@ -163,6 +163,7 @@ int main(int argc, char* argv[]) {
       // clear for new event
       id->clear();
       status->clear();
+      statusHepMC->clear();
       mass->clear();
       pt->clear();
       eta->clear();
@@ -183,6 +184,7 @@ int main(int argc, char* argv[]) {
 	// save particle information
 	id->push_back(pythia.event[iP].id());
 	status->push_back(pythia.event[iP].status());
+	statusHepMC->push_back(pythia.event[iP].statusHepMC());
 	mass->push_back(pythia.event[iP].m());
 	pt->push_back(pythia.event[iP].pT());
 	eta->push_back(pythia.event[iP].eta());
