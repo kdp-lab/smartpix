@@ -9,3 +9,4 @@ bin/
 *.h5
 *.root
 *.hepmc
+*.txt
