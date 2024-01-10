@@ -15,6 +15,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "Pythia8Plugins/HepMC3.h"
+#include "TH1D.h"
 
 // declare pythia8 namespace
 using namespace Pythia8;
@@ -69,6 +70,9 @@ int main(int argc, char* argv[]) {
   TFile* f = new TFile((outFileName + ".root").c_str(),"RECREATE");
   TTree* t = new TTree("t","t");
 
+  // Create a histogram for mc event weights
+  TH1D* MetaData = new TH1D("MetaData", "", 2, 0, 1);
+  
   // Interface for conversion from Pythia8::Event to HepMC event.
   HepMC3::Pythia8ToHepMC3 toHepMC;
   // Specify file where HepMC events will be stored.
@@ -201,8 +205,15 @@ int main(int argc, char* argv[]) {
     }
     
     pythia.stat();
-  } 
+  }
 
+  // save metadata to root (this is automatic in hepmc file)
+  MetaData->SetBinContent(1, info.sigmaGen());
+  MetaData->GetXaxis()->SetBinLabel(1, "sigmaGen");
+  MetaData->SetBinContent(2, info.weightSum());
+  MetaData->GetXaxis()->SetBinLabel(2, "weightsSum");
+  MetaData->Write();
+  
   // write and cleanup
   t->Write();  
   delete t;
