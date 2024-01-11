@@ -55,7 +55,9 @@ if __name__ == "__main__":
 
                 # track properties
                 cota = particle.momentum.phi()
-                cotb = particle.momentum.eta()
+                # based on the image here https://github.com/kdp-lab/pixelav/blob/ppixelav2v2/ppixelav2_operating_inst.pdf
+                cota = 1./np.tan(particle.momentum.phi()) # phi = alpha - pi -> cot(alpha) = cot(phi+pi) = cot(phi) = 1/tan(phi)
+                cotb = 1./np.tan(particle.momentum.theta()) # theta = beta - pi -> cot(beta) = cot(theta+pi) = cot(theta) = 1/tan(theta)
                 p = particle.momentum.p3mod()
                 flp = 0
                 localx = prod_vector.x # this needs to be particle position at start of pixel detector or only save particles that are produced within epsilon distance of detector
