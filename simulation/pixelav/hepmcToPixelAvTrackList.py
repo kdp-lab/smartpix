@@ -16,6 +16,7 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--inFileName", help="Input file name", default="/home/abadea/asic/smartpix/simulation/test.hepmc")
     parser.add_argument("-o", "--outFileName", help="Output file name", default="track_list.txt")
     parser.add_argument("-n", "--nparticles", help="Number of particles to save in track list (-1=All). ", default=100, type=int)
+    parser.add_argument("-p", "--float_precision", help="Float precision to save to track_list. ", default=5, type=int)
     ops = parser.parse_args()
 
     # list for tracks
@@ -69,5 +70,11 @@ if __name__ == "__main__":
                 break # need to understand what to put in track_list between events
 
         # save to file
-        # need to update this so that flp is an int 0/1 not 0.0000 or 1.0000
-        np.savetxt(ops.outFileName, tracks, delimiter=' ', fmt="%f")
+        float_precision=4
+        with open(ops.outFileName, 'w') as file:
+            for track in tracks:
+                formatted_sublist = [f"{element:.{ops.float_precision}f}" if isinstance(element, float) else element for element in track]
+                line = ' '.join(map(str, formatted_sublist)) + '\n'
+                file.write(line)
+
+        # np.savetxt(ops.outFileName, tracks, delimiter=' ', fmt="%f")
