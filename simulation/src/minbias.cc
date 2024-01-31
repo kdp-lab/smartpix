@@ -134,11 +134,11 @@ int main(int argc, char* argv[]) {
   settings.parm("PhaseSpace:pTHatMax", pTHatMax);
   
   // Hard processes in one step, but pT-weighted.
-  if (pTHatMin > 0){
-    pythia.readString("PhaseSpace:bias2Selection = on");
-    pythia.readString("PhaseSpace:bias2SelectionPow = 4.");
-    pythia.readString("PhaseSpace:bias2SelectionRef = 20.");
-  }
+  // if (pTHatMin > 0){
+  //   pythia.readString("PhaseSpace:bias2Selection = on");
+  //   pythia.readString("PhaseSpace:bias2SelectionPow = 4.");
+  //   pythia.readString("PhaseSpace:bias2SelectionRef = 20.");
+  // }
 
    // Initialize for LHC at 13.6 TeV
   pythia.readString("Beams:eCM = 13600.");

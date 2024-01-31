@@ -25,12 +25,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-o", "--outDir", help="Output directory", default="./")
     parser.add_argument("-j", "--ncpu", help="Number of cores to use", default=4, type=int)
+    parser.add_argument("-n", "--maxEvents", help="Number of events per bin", default=1000, type=str)
     ops = parser.parse_args()
     
     # ./minbias.exe <outFileName> <maxEvents> <pTHatMin> <pTHatMax>
     path_to_executable = "./bin/minbias.exe"
     pt = np.linspace(0,2,11)
-    maxEvents = str(1000)
+    # maxEvents = str(1000)
     # options_list = []
     commands = []
     for pTHatMin, pTHatMax in zip(pt[0:-1],pt[1:]):
@@ -43,7 +44,7 @@ if __name__ == "__main__":
         # print(options_list[-1])
 
         # pythia
-        pythia = ["./bin/minbias.exe", outFileName, maxEvents, str(pTHatMin), str(pTHatMax)]
+        pythia = ["./bin/minbias.exe", outFileName, ops.maxEvents, str(pTHatMin), str(pTHatMax)]
         # delphes
         delphes = ["/opt/delphes/DelphesHepMC3", "/opt/delphes/cards/delphes_card_CMS.tcl", outFileName+".root", outFileName+".hepmc"]
         # commands
