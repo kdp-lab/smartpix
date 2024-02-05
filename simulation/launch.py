@@ -16,7 +16,13 @@ def run_executable(executable_path, options):
 def run_commands(commands):
     for command in commands:
         print(command)
-        subprocess.run(command)
+        if "pixelav" in command[0]:
+            # cwd = os.getcwd()
+            # os.chdir(command[0])
+            subprocess.run(command[1:], cwd=command[0])
+            # os.chdir(cwd)
+        else:
+            subprocess.run(command)
     
 
 if __name__ == "__main__":
@@ -26,6 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--outDir", help="Output directory", default="./")
     parser.add_argument("-j", "--ncpu", help="Number of cores to use", default=4, type=int)
     parser.add_argument("-n", "--maxEvents", help="Number of events per bin", default=1000, type=str)
+    parser.add_argument("-p", "--pixelAVdir", help="pixelAV directory", default="../../pixelav/")
     ops = parser.parse_args()
 
     # check if outdir exists
@@ -58,9 +65,13 @@ if __name__ == "__main__":
         # delphes to track list for pixelAV
         # python pixelav/delphesRootToPixelAvTrackList.py -i outdir/cmsMatch/10/minbias_0.30_0.40_GeV.root -o test.txt
         trackList = ["python3", "pixelav/delphesRootToPixelAvTrackList.py", "-i", f"{outFileName}.root", "-o", f"{outFileName}.txt"]
+
+        # pixelAV
+        # ../../pixelav/bin/ppixelav2_list_trkpy_n_2f.exe 1 outdir/cmsMatch/11/minbias_0.40_0.50_GeV.txt temp/minbias_0.40_0.50_GeV.out temp/seedfile
+        pixelAV = [ops.pixelAVdir, "./bin/ppixelav2_list_trkpy_n_2f.exe", "1", f"{outFileName}.txt", f"{outFileName}.out", f"{outFileName}_seed"]
         
         # commands
-        commands.append([(pythia, delphes, trackList),]) # weird formatting is because pool expects a tuple at input
+        commands.append([(pythia, delphes, trackList, pixelAV),]) # weird formatting is because pool expects a tuple at input
         
     # List of CPU cores to use for parallel execution
     num_cores = multiprocessing.cpu_count() if ops.ncpu == -1 else ops.ncpu
