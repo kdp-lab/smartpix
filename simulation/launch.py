@@ -27,10 +27,14 @@ if __name__ == "__main__":
     parser.add_argument("-j", "--ncpu", help="Number of cores to use", default=4, type=int)
     parser.add_argument("-n", "--maxEvents", help="Number of events per bin", default=1000, type=str)
     ops = parser.parse_args()
-    
+
+    # check if outdir exists
+    if not os.path.isdir(ops.outDir):
+        os.makedirs(ops.outDir)
+
     # ./minbias.exe <outFileName> <maxEvents> <pTHatMin> <pTHatMax>
     path_to_executable = "./bin/minbias.exe"
-    pt = np.linspace(0,2,11)
+    pt = np.linspace(0,2,21)
     # maxEvents = str(1000)
     # options_list = []
     commands = []
@@ -46,7 +50,9 @@ if __name__ == "__main__":
         # pythia
         pythia = ["./bin/minbias.exe", outFileName, ops.maxEvents, str(pTHatMin), str(pTHatMax)]
         # delphes
-        delphes = ["/opt/delphes/DelphesHepMC3", "/opt/delphes/cards/delphes_card_CMS.tcl", outFileName+".root", outFileName+".hepmc"]
+        # card = os.path.join("/opt/delphes/cards", "delphes_card_CMS.tcl")
+        card = "./delphes_card_CMS_ABEdit.tcl"
+        delphes = ["/opt/delphes/DelphesHepMC3", card, outFileName+".root", outFileName+".hepmc"]
         # commands
         commands.append([(pythia, delphes),]) # weird formatting is because pool expects a tuple at input
         
