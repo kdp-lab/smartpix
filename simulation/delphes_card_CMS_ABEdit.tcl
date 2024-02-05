@@ -69,8 +69,8 @@ module ParticlePropagator ParticlePropagator {
   set ElectronOutputArray electrons
   set MuonOutputArray muons
 
-  # radius of the magnetic field coverage, in m
-  set Radius 1.29
+  # radius of the magnetic field coverage, in m (Usually 1.29)
+  set Radius 0.03
   # half-length of the magnetic field coverage, in m
   set HalfLength 3.00
 
