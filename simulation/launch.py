@@ -49,12 +49,18 @@ if __name__ == "__main__":
 
         # pythia
         pythia = ["./bin/minbias.exe", outFileName, ops.maxEvents, str(pTHatMin), str(pTHatMax)]
+
         # delphes
         # card = os.path.join("/opt/delphes/cards", "delphes_card_CMS.tcl")
         card = "./delphes_card_CMS_ABEdit.tcl"
         delphes = ["/opt/delphes/DelphesHepMC3", card, outFileName+".root", outFileName+".hepmc"]
+
+        # delphes to track list for pixelAV
+        # python pixelav/delphesRootToPixelAvTrackList.py -i outdir/cmsMatch/10/minbias_0.30_0.40_GeV.root -o test.txt
+        trackList = ["python3", "pixelav/delphesRootToPixelAvTrackList.py", "-i", f"{outFileName}.root", "-o", f"{outFileName}.txt"]
+        
         # commands
-        commands.append([(pythia, delphes),]) # weird formatting is because pool expects a tuple at input
+        commands.append([(pythia, delphes, trackList),]) # weird formatting is because pool expects a tuple at input
         
     # List of CPU cores to use for parallel execution
     num_cores = multiprocessing.cpu_count() if ops.ncpu == -1 else ops.ncpu
